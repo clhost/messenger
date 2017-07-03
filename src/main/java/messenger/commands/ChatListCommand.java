@@ -1,7 +1,7 @@
 package messenger.commands;
 
 import messenger.messages.Message;
-import messenger.net.nonblocking.ChannelSession;
+import messenger.net.server.ChannelSession;
 
 /**
  * @author clhost

@@ -6,8 +6,8 @@ import messenger.messages.Message;
 import messenger.messages.RegMessage;
 import messenger.messages.TextMessage;
 import messenger.messages.Type;
-import messenger.net.ProtocolException;
-import messenger.net.nonblocking.ChannelSession;
+import messenger.net.protocol.ProtocolException;
+import messenger.net.server.ChannelSession;
 import messenger.store.UserService;
 
 import java.io.IOException;

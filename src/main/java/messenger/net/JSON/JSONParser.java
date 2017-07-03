@@ -1,6 +1,7 @@
 package messenger.net.JSON;
 
 import java.io.BufferedReader;
+import java.io.StringReader;
 import java.util.ArrayList;
 
 /**
@@ -22,7 +23,7 @@ public class JSONParser {
     }
 
     /**
-     * @description: split JSON file to JSONObject's
+     * @description split JSON file to JSONObject's
      */
     public void parseJSON() {
         if (json != null) {
@@ -32,18 +33,19 @@ public class JSONParser {
         }
     }
 
-    public String getValue(String field) {
+    public String getValue(String field, int id) {
         boolean isFound = false;
         int index = 0;
         String line = "";
         StringBuilder builder = new StringBuilder();
+        JSONReader = new BufferedReader(new StringReader(JSONArray.get(id).getJSONString()));
 
         while (!isFound) {
             try {
                 line = JSONReader.readLine();
                 index = line.indexOf(field); // unsafe: example: "log" in "login" is always > -1
             } catch (Exception e) {
-                e.printStackTrace();
+                return null;
             }
 
             if (index != -1) {

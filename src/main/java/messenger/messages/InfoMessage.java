@@ -6,11 +6,11 @@ package messenger.messages;
 public class InfoMessage extends Message {
     private Long user_id;
 
-    public void setId(Long id) {
+    public void setUserId(Long id) {
         user_id = id;
     }
 
-    public Long getId() {
+    public Long getUserId() {
         return user_id;
     }
 }

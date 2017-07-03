@@ -3,8 +3,8 @@ package messenger.commands;
 import messenger.messages.Message;
 import messenger.messages.TextMessage;
 import messenger.messages.Type;
-import messenger.net.ProtocolException;
-import messenger.net.nonblocking.ChannelSession;
+import messenger.net.protocol.ProtocolException;
+import messenger.net.server.ChannelSession;
 
 import java.io.IOException;
 import java.util.Arrays;

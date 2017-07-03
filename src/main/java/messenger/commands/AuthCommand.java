@@ -3,8 +3,8 @@ package messenger.commands;
 import messenger.store.datasets.Chat;
 import messenger.store.datasets.User;
 import messenger.messages.*;
-import messenger.net.ProtocolException;
-import messenger.net.nonblocking.ChannelSession;
+import messenger.net.protocol.ProtocolException;
+import messenger.net.server.ChannelSession;
 import messenger.store.MessageService;
 import messenger.store.UserService;
 

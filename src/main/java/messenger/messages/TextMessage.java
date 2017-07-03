@@ -7,7 +7,7 @@ import java.util.Objects;
  */
 public class TextMessage extends Message {
     private String text;
-    private Long chad_id;
+    private Long chat_id;
 
     public String getText() {
         return text;
@@ -44,11 +44,11 @@ public class TextMessage extends Message {
                 '}';*/text;
     }
 
-    public Long getChad_id() {
-        return chad_id;
+    public Long getChat_id() {
+        return chat_id;
     }
 
-    public void setChad_id(Long chad_id) {
-        this.chad_id = chad_id;
+    public void setChat_id(Long chat_id) {
+        this.chat_id = chat_id;
     }
 }

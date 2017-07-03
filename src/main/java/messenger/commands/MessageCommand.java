@@ -3,8 +3,8 @@ package messenger.commands;
 
 import messenger.messages.Message;
 import messenger.messages.TextMessage;
-import messenger.net.nonblocking.ChannelSession;
-import messenger.net.nonblocking.NonBlockingServer;
+import messenger.net.server.ChannelSession;
+import messenger.net.server.NonBlockingServer;
 import messenger.store.MessageService;
 
 import java.util.List;
@@ -24,8 +24,8 @@ public class MessageCommand implements Command {
 
         // сначала раскидаем по сессиям
         TextMessage textMessage = (TextMessage) message;
-        List<Long> participants = session.getChatById(textMessage.getChad_id()).getParticipantIds();
-        participants.add(session.getChatById(textMessage.getChad_id()).getAdminId());
+        List<Long> participants = session.getChatById(textMessage.getChat_id()).getParticipantIds();
+        participants.add(session.getChatById(textMessage.getChat_id()).getAdminId());
 
         NonBlockingServer.sendMessageToOtherSessionsInRealTime(textMessage, participants);
 
@@ -33,7 +33,7 @@ public class MessageCommand implements Command {
         Long msgId = messageService.addMessage(textMessage);
         textMessage.setId(msgId);
         System.err.println("MESSAGE [" + textMessage.getText() + "] has been added into data base. Message id [" + textMessage.getId() +
-                            "].  Chat id [" + textMessage.getChad_id() +
+                            "].  Chat id [" + textMessage.getChat_id() +
                             "]. Sender id [" + textMessage.getSenderId() + "].");
     }
 }

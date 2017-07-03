@@ -83,7 +83,7 @@ public class MessageService implements MessageStore {
                     TextMessage textMessage = new TextMessage();
                     textMessage.setId(message_id);
                     textMessage.setSenderId(sender_id);
-                    textMessage.setChad_id(chat_id);
+                    textMessage.setChat_id(chat_id);
                     textMessage.setText(message);
                     textMessage.setType(Type.MSG_TEXT);
                     messages.add(textMessage);
@@ -92,7 +92,7 @@ public class MessageService implements MessageStore {
                 // помещаем во все чаты все сообщения
                 for (int i = 0; i < messages.size(); i++) {
                     TextMessage textMessage = messages.get(i);
-                    Long chadId = textMessage.getChad_id();
+                    Long chadId = textMessage.getChat_id();
                     chatList.get(chadId).setMessage(textMessage);
                 }
 
@@ -143,7 +143,7 @@ public class MessageService implements MessageStore {
                 Long mid = res.getLong("mid");
                 ++mid;
                 statement.executeUpdate("INSERT INTO MESSAGE(ID, SENDER_ID, CHAT_ID, MESSAGE) VALUES('" + mid + "', '"
-                                             + txt.getSenderId() + "', '" + txt.getChad_id() + "', '" + txt.getText() + "');");
+                                             + txt.getSenderId() + "', '" + txt.getChat_id() + "', '" + txt.getText() + "');");
                 return mid;
             }
         } catch (ClassNotFoundException | SQLException e) {

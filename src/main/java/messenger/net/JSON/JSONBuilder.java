@@ -73,44 +73,4 @@ public class JSONBuilder {
             builder.append("\t");
         }
     }
-
-    public static void main(String[] args) {
-        AuthMessage authMessage1 = new AuthMessage("admin", "admin");
-        authMessage1.setId(1L);
-        authMessage1.setSenderId(1L);
-        authMessage1.setType(Type.MSG_LOGIN);
-
-        AuthMessage authMessage2 = new AuthMessage("test", "test");
-        authMessage2.setId(2L);
-        authMessage2.setSenderId(2L);
-        authMessage2.setType(Type.MSG_LOGIN);
-
-        TextMessage textMessage = new TextMessage();
-        textMessage.setChat_id(1L);
-        textMessage.setText("Привет мир!");
-        textMessage.setId(3L);
-        textMessage.setSenderId(1L);
-        textMessage.setType(Type.MSG_TEXT);
-
-        JSON json = null;
-        try {
-            json = new JSONBuilder().append(authMessage1).append(authMessage2).append(textMessage).build();
-            /*System.out.println(s);
-            System.out.println("---------------------");*/
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        JSONParser jsonParser = new JSONParser();
-        jsonParser.registerJSON(json);
-        jsonParser.parseJSON();
-
-        jsonParser.getValue("login");
-        jsonParser.getValue("password");
-        /*
-        Iterator iterator = json.iterator();
-        while (iterator.hasNext()) {
-            System.out.print(json.iterator().next());
-        }*/
-    }
 }

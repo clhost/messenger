@@ -4,9 +4,9 @@ package messenger.client;
 import messenger.store.datasets.Chat;
 import messenger.store.datasets.User;
 import messenger.messages.*;
-import messenger.net.Protocol;
-import messenger.net.ProtocolException;
-import messenger.net.StringProtocol;
+import messenger.net.protocol.Protocol;
+import messenger.net.protocol.ProtocolException;
+import messenger.net.protocol.StringProtocol;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -169,7 +169,7 @@ public class MessengerClient {
                     TextMessage sendMessage = new TextMessage();
                     sendMessage.setType(Type.MSG_TEXT);
                     sendMessage.setSenderId(user.getId());
-                    sendMessage.setChad_id(Long.valueOf(tokens[1])); // FIXME id чата, куда можно отправить. Чат должен быть в списке чатов пользователя.
+                    sendMessage.setChat_id(Long.valueOf(tokens[1])); // FIXME id чата, куда можно отправить. Чат должен быть в списке чатов пользователя.
                     sendMessage.setText(messageTextBuilder.toString());
                     send(sendMessage);
                 } else {
@@ -180,9 +180,9 @@ public class MessengerClient {
                 InfoMessage infoMessage = new InfoMessage();
                 infoMessage.setType(Type.MSG_INFO);
                 if (tokens.length == 2) {
-                    infoMessage.setId(Long.parseLong(tokens[1]));
+                    infoMessage.setUserId(Long.parseLong(tokens[1]));
                 } else if (user != null) {
-                    infoMessage.setId(user.getId());
+                    infoMessage.setUserId(user.getId());
                     infoMessage.setSenderId(user.getId());
                 }
                 send(infoMessage);

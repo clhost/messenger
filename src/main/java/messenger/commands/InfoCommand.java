@@ -6,8 +6,8 @@ import messenger.messages.InfoMessage;
 import messenger.messages.Message;
 import messenger.messages.TextMessage;
 import messenger.messages.Type;
-import messenger.net.ProtocolException;
-import messenger.net.nonblocking.ChannelSession;
+import messenger.net.protocol.ProtocolException;
+import messenger.net.server.ChannelSession;
 import messenger.store.UserService;
 
 import java.io.IOException;
@@ -25,9 +25,9 @@ public class InfoCommand implements Command {
     @Override
     public void execute(ChannelSession session, Message message) {
         InfoMessage infoMessage = (InfoMessage) message;
-        User user = userService.getUserById(infoMessage.getId());
+        User user = userService.getUserById(infoMessage.getUserId());
         StringBuilder builder = new StringBuilder();
-        String info = "Информация по пользователю с id: " + "[" + infoMessage.getId() + "]: ";
+        String info = "Информация по пользователю с id: " + "[" + infoMessage.getUserId() + "]: ";
 
         if (user == null) {
             builder.append("Пользователь с указанным id не найден.");
