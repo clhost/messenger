@@ -1,7 +1,8 @@
-package messenger.net;
+package messenger.net.server;
 
 
 import messenger.messages.Message;
+import messenger.net.protocol.ProtocolException;
 
 import java.io.IOException;
 

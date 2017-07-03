@@ -1,12 +1,12 @@
-package messenger.net.nonblocking;
+package messenger.net.server;
 
 import messenger.commands.Command;
 import messenger.commands.CommandFactory;
 import messenger.messages.Message;
 import messenger.messages.TextMessage;
-import messenger.net.Protocol;
-import messenger.net.ProtocolException;
-import messenger.net.StringProtocol;
+import messenger.net.protocol.Protocol;
+import messenger.net.protocol.ProtocolException;
+import messenger.net.protocol.StringProtocol;
 import messenger.store.MessageService;
 import messenger.store.UserService;
 
@@ -106,7 +106,7 @@ public class NonBlockingServer {
         int i = 0;
         while (i < participants.size()) {
             try {
-                sessions.get(participants.get(i)).getChatById(textMessage.getChad_id()).setMessage(textMessage);
+                sessions.get(participants.get(i)).getChatById(textMessage.getChat_id()).setMessage(textMessage);
             } catch (NullPointerException e) {
                 // пользователь не в сети, не отсылаем ему ничего
             }
@@ -129,7 +129,7 @@ public class NonBlockingServer {
         return null;
     }
 
-    private static ServerSocketChannel openAndBind() throws IOException {
+    private static ServerSocketChannel  openAndBind() throws IOException {
         ServerSocketChannel open = ServerSocketChannel.open();
         open.bind(new InetSocketAddress(19000));
         return open;

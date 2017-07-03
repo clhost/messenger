@@ -1,8 +1,5 @@
-package messenger.net;
+package messenger.net.protocol;
 
-/**
- * Исключение, которое бросается, когда происходят ошибки кодирования/декодирования
- */
 public class ProtocolException extends Exception {
     public ProtocolException(String msg) {
         super(msg);

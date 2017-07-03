@@ -1,4 +1,4 @@
-package messenger.net;
+package messenger.net.protocol;
 
 import messenger.messages.Message;
 

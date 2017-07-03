@@ -1,4 +1,4 @@
-package messenger.net.nonblocking;
+package messenger.net.server;
 
 
 import messenger.store.datasets.Chat;
@@ -6,10 +6,9 @@ import messenger.store.datasets.User;
 import messenger.messages.Message;
 import messenger.messages.TextMessage;
 import messenger.messages.Type;
-import messenger.net.Protocol;
-import messenger.net.ProtocolException;
-import messenger.net.Session;
-import messenger.net.StringProtocol;
+import messenger.net.protocol.Protocol;
+import messenger.net.protocol.ProtocolException;
+import messenger.net.protocol.StringProtocol;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

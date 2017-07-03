@@ -1,4 +1,4 @@
-package messenger.net;
+package messenger.net.protocol;
 
 import messenger.messages.*;
 
@@ -19,7 +19,7 @@ public class StringProtocol implements Protocol {
             case MSG_TEXT:
                 TextMessage textMsg = new TextMessage();
                 textMsg.setSenderId(parseLong(tokens[1]));
-                textMsg.setChad_id(Long.valueOf(tokens[2]));
+                textMsg.setChat_id(Long.valueOf(tokens[2]));
                 textMsg.setText(tokens[3]);
                 textMsg.setType(type);
                 return textMsg;
@@ -35,7 +35,7 @@ public class StringProtocol implements Protocol {
             case MSG_INFO:
                 InfoMessage infoMessage = new InfoMessage();
                 infoMessage.setType(type);
-                infoMessage.setId(Long.parseLong(tokens[1]));
+                infoMessage.setUserId(Long.parseLong(tokens[1]));
                 if (tokens.length > 2) {
                     infoMessage.setSenderId(Long.parseLong(tokens[2]));
                 }
@@ -105,7 +105,7 @@ public class StringProtocol implements Protocol {
             case MSG_TEXT:
                 TextMessage sendMessage = (TextMessage) msg;
                 builder.append(String.valueOf(sendMessage.getSenderId())).append(DELIMITER);
-                builder.append(sendMessage.getChad_id()).append(DELIMITER);
+                builder.append(sendMessage.getChat_id()).append(DELIMITER);
                 builder.append(sendMessage.getText()).append(DELIMITER);
                 break;
             case MSG_LOGIN:
@@ -122,7 +122,7 @@ public class StringProtocol implements Protocol {
                 break;
             case MSG_INFO:
                 InfoMessage infoMessage = (InfoMessage) msg;
-                builder.append(infoMessage.getId()).append(DELIMITER);
+                builder.append(infoMessage.getUserId()).append(DELIMITER);
                 Long senderId = infoMessage.getSenderId();
                 if (senderId != null) {
                     builder.append(infoMessage.getSenderId());
