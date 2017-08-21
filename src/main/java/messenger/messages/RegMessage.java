@@ -1,14 +1,11 @@
 package messenger.messages;
 
-/**
- * @author clhost
- */
 public class RegMessage extends Message {
     private Long id;
     private String login;
     private String password;
-    private String firstname;
-    private String lastname;
+    private String firstName;
+    private String lastName;
 
     public RegMessage(String login, String password) {
         this.login = login;
@@ -16,8 +13,8 @@ public class RegMessage extends Message {
     }
 
     public void setFullName(String firstname, String lastname) {
-        this.firstname = firstname;
-        this.lastname = lastname;
+        this.firstName = firstname;
+        this.lastName = lastname;
     }
 
     public void setId(Long id) {
@@ -28,12 +25,12 @@ public class RegMessage extends Message {
         return id;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getLastName() {
+        return lastName;
     }
 
     public String getPassword() {

@@ -5,14 +5,12 @@ import messenger.messages.TextMessage;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author clhost
- */
 public class Chat {
     private Long id;
     private ArrayList<TextMessage> messages;
     private List<Long> participantIds;
     private Long adminId;
+    private String chatName;
 
     public Chat() {
         messages = new ArrayList<>();
@@ -27,7 +25,7 @@ public class Chat {
         this.id = id;
     }
 
-    public void setMessage(TextMessage message) {
+    public void addMessage(TextMessage message) {
         messages.add(message);
     }
 
@@ -57,5 +55,13 @@ public class Chat {
 
     public void setMessages(ArrayList<TextMessage> messages) {
         this.messages = messages;
+    }
+
+    public String getChatName() {
+        return chatName;
+    }
+
+    public void setChatName(String chatName) {
+        this.chatName = chatName;
     }
 }

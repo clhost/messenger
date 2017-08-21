@@ -2,40 +2,68 @@ package messenger.store;
 
 
 import messenger.store.datasets.User;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.sql.*;
 import java.util.ArrayList;
 
 public class UserService implements UserStore {
+    private static final String TABLE_MESSAGE = "MESSAGE";
+    private static final String TABLE_CHAT = "CHAT";
+    private static final String TABLE_USER = "USER";
+    private static final String TABLE_FRIENDS = "USER_FRIEND";
+    private static final String TABLE_PARTICIPANTS = "CHAT_USER";
+
+    private static final String[] COLUMNS_TABLE_MESSAGE = {"ID", "SENDER_ID", "CHAT_ID", "TEXT", "SEND_TIME"};
+    private static final String[] COLUMNS_TABLE_CHAT = {"ID", "ADMIN_ID", "CHAT_NAME"};
+    private static final String[] COLUMNS_TABLE_USER = {"ID", "FIRST_NAME", "LAST_NAME", "LOGIN", "PASSWORD", "DESCRIPTION"};
+    private static final String[] COLUMNS_TABLE_FRIENDS = {"USER_ID", "FRIEND_ID"};
+    private static final String[] COLUMNS_TABLE_PARTICIPANTS = {"ID_CHAT", "ID_USER"};
+
+    private static Logger logger = LogManager.getLogger(UserService.class);
+
     @Override
-    public User addUser(String login, String password, String firstname, String lastname) {
+    public User addUser(String login, String password, String firstName, String lastName) {
+        Connection connection = null;
         try {
-            Connection connection = initConnection();
+            connection = ConnectionPool.getInstance().getConnection();
+
             try (Statement statement = connection.createStatement()) {
-                ResultSet res = statement.executeQuery("SELECT max(ID) AS UID FROM USERS;");
+                ResultSet res = statement.executeQuery("SELECT max(" + COLUMNS_TABLE_USER[0] + ") AS UID FROM " + TABLE_USER + ";");
                 res.next();
-                int uid = res.getInt("uid");
+
+                int uid = res.getInt("UID");
                 ++uid;
+
                 try {
-                    statement.executeUpdate("INSERT INTO USERS(ID, FIRSTNAME, LASTNAME, LOGIN, PASSWORD) VALUES(" + uid + ", '" +
-                            firstname + "', '" + lastname + "', '" + login + "', '" + password + "');");
-                    System.err.println("User " + login + " has been created.");
+                    statement.executeUpdate("INSERT INTO " + TABLE_USER + " ( " +
+                            COLUMNS_TABLE_USER[0] + ", " + COLUMNS_TABLE_USER[1] + ", " +
+                            COLUMNS_TABLE_USER[2] + ", " + COLUMNS_TABLE_USER[3] + ", " +
+                            COLUMNS_TABLE_USER[4] + ", " +
+                            ") VALUES(" + uid + ", '" +
+                            firstName + "', '" + lastName + "', '" + login + "', '" + password + "');");
+
+                    logger.info("Пользователь " + login + " был создан.");
                 } catch (SQLException e) {
-                    return null; // если пользователь с таким логином уже существует
+                    logger.warn("Пользователь с логином " + login + " уже существует.");
+                    return null;
                 }
 
-                System.out.println("Created user: " + uid + " : " + firstname + " : " + lastname + " : " + login + " : " + password);
                 User user = new User();
                 user.setId(uid);
-                user.setFirstName(firstname);
-                user.setLastName(lastname);
+                user.setFirstName(firstName);
+                user.setLastName(lastName);
                 user.setLogin(login);
                 user.setPassword(password);
                 return user;
             }
 
-        } catch (ClassNotFoundException | SQLException e) {
-            System.err.println("Connection error.");
+        } catch (SQLException e) {
+            logger.error("Connection error.");
             e.printStackTrace();
+        } finally {
+            ConnectionPool.getInstance().putConnection(connection);
         }
         return null;
     }
@@ -46,90 +74,90 @@ public class UserService implements UserStore {
     }
 
     @Override
-    public User getUser(String login, String pass) {
+    public User getUser(String login, String password) {
+        Connection connection = null;
         try {
-            Connection connection = initConnection();
+            connection = ConnectionPool.getInstance().getConnection();
+
             try (Statement statement = connection.createStatement()) {
-                ResultSet resultSet = statement.executeQuery("SELECT * FROM USERS WHERE LOGIN = '" + login + "' AND PASSWORD = '" + pass + "';");
+                ResultSet resultSet = statement.executeQuery(
+                        "SELECT * FROM " + TABLE_USER +
+                                " WHERE " + COLUMNS_TABLE_USER[3] + "  = '" + login + "' AND " + COLUMNS_TABLE_USER[4] + " = '" + password + "';");
+
                 while (resultSet.next()) {
-                    System.out.println("RETURNED FROM DB USER: " + "id: " + resultSet.getInt("id") + " | " + "Name: " + resultSet.getString("firstname")
-                            + " | " + "Lastname: " + resultSet.getString("lastname")+ " | " + "Login: " + resultSet.getString("login")
-                            + " | " + "Pass: " + resultSet.getString("password"));
                     User user = new User();
-                    user.setId(resultSet.getInt("ID"));
-                    user.setFirstName(resultSet.getString("FIRSTNAME"));
-                    user.setLastName(resultSet.getString("LASTNAME"));
-                    user.setLogin(resultSet.getString("LOGIN"));
-                    user.setPassword(resultSet.getString("PASSWORD"));
+                    user.setId(resultSet.getInt(COLUMNS_TABLE_USER[0]));
+                    user.setFirstName(resultSet.getString(COLUMNS_TABLE_USER[1]));
+                    user.setLastName(resultSet.getString(COLUMNS_TABLE_USER[2]));
+                    user.setLogin(resultSet.getString(COLUMNS_TABLE_USER[3]));
+                    user.setPassword(resultSet.getString(COLUMNS_TABLE_USER[4]));
+                    user.setDescription(resultSet.getString(COLUMNS_TABLE_USER[5]));
                     return user;
                 }
             }
 
-        } catch (ClassNotFoundException | SQLException e) {
-            System.err.println("Connection error.");
+        } catch (SQLException e) {
+            logger.error("Connection error.");
             e.printStackTrace();
+        } finally {
+            ConnectionPool.getInstance().putConnection(connection);
         }
         return null;
     }
 
     @Override
     public User getUserById(Long id) {
+        Connection connection = null;
         try {
-            Connection connection = initConnection();
-            try (Statement statement = connection.createStatement()) {
-                ResultSet resultSet = statement.executeQuery("SELECT ID, FIRSTNAME, LASTNAME FROM USERS WHERE ID = " + id + ";");
-                while (resultSet.next()) {
-                    System.out.println(resultSet.getInt("id") + " : " + resultSet.getString("firstname")
-                            + " : " + resultSet.getString("lastname"));
+            connection = ConnectionPool.getInstance().getConnection();
 
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resultSet = statement.executeQuery(
+                        "SELECT " + COLUMNS_TABLE_USER[0] + ", " + COLUMNS_TABLE_USER[1] + ", " + COLUMNS_TABLE_USER[2] +
+                                " FROM " + TABLE_USER + " WHERE " + COLUMNS_TABLE_USER[0] + " = " + id + ";");
+
+                while (resultSet.next()) {
                     User user = new User();
-                    user.setId(resultSet.getInt("ID"));
-                    user.setFirstName(resultSet.getString("FIRSTNAME"));
-                    user.setLastName(resultSet.getString("LASTNAME"));
+                    user.setId(resultSet.getInt(COLUMNS_TABLE_USER[0]));
+                    user.setFirstName(resultSet.getString(COLUMNS_TABLE_USER[1]));
+                    user.setLastName(resultSet.getString(COLUMNS_TABLE_USER[2]));
                     return user;
                 }
             }
 
-        } catch (ClassNotFoundException | SQLException e) {
-            System.err.println("Connection error.");
+        } catch (SQLException e) {
+            logger.error("Connection error.");
             e.printStackTrace();
+        } finally {
+            ConnectionPool.getInstance().putConnection(connection);
         }
         return null;
     }
 
     public ArrayList<Long> getUsersId(ArrayList<Long> participants) {
-        String set = participants.toString().replace('[', '(').replace(']',')');
-        System.out.println(set);
+        String set = participants.toString().replace('[', '(').replace(']', ')');
+        Connection connection = null;
         try {
-            Connection connection = initConnection();
+            connection = ConnectionPool.getInstance().getConnection();
+
             try (Statement statement = connection.createStatement()) {
-                ResultSet resultSet = statement.executeQuery("SELECT ID FROM USERS WHERE ID IN" + set + ";");
+                ResultSet resultSet = statement.executeQuery(
+                        "SELECT " + COLUMNS_TABLE_USER[0] + " FROM " + TABLE_USER +
+                                " WHERE " + COLUMNS_TABLE_USER[0] + " IN" + set + ";");
+
                 ArrayList<Long> users_id = new ArrayList<>();
                 while (resultSet.next()) {
-                    users_id.add(resultSet.getLong("id"));
+                    users_id.add(resultSet.getLong(COLUMNS_TABLE_USER[0]));
                 }
                 return users_id;
             }
 
-        } catch (ClassNotFoundException | SQLException e) {
-            System.err.println("Connection error.");
+        } catch (SQLException e) {
+            logger.error("Connection error.");
             e.printStackTrace();
+        } finally {
+            ConnectionPool.getInstance().putConnection(connection);
         }
         return null;
-    }
-
-    private Connection initConnection() throws ClassNotFoundException, SQLException {
-        Class.forName("org.h2.Driver");
-        return DriverManager.getConnection("jdbc:h2:~/test", "clhost", "struct.host");
-    }
-
-    public static void main(String[] args) {
-        UserService service = new UserService();
-        ArrayList<Long> a = new ArrayList<>();
-        a.add((long) 2);
-        a.add((long) 3);
-        a.add((long) 4);
-        ArrayList<Long> b = service.getUsersId(a);
-        System.out.println(b);
     }
 }

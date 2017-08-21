@@ -2,12 +2,10 @@ package messenger.messages;
 
 import java.util.ArrayList;
 
-/**
- * @author clhost
- */
 public class ChatCreateMessage extends Message {
     private ArrayList<Long> participants;
     private Long creator_id;
+    private String chatName;
 
     public ChatCreateMessage() {
         participants = new ArrayList<>();
@@ -33,5 +31,13 @@ public class ChatCreateMessage extends Message {
 
     public void setCreator_id(Long creator_id) {
         this.creator_id = creator_id;
+    }
+
+    public String getChatName() {
+        return chatName;
+    }
+
+    public void setChatName(String chatName) {
+        this.chatName = chatName;
     }
 }

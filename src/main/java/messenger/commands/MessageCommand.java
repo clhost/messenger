@@ -3,37 +3,28 @@ package messenger.commands;
 
 import messenger.messages.Message;
 import messenger.messages.TextMessage;
-import messenger.net.server.ChannelSession;
-import messenger.net.server.NonBlockingServer;
+import messenger.net.server.ClientSession;
 import messenger.store.MessageService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.util.List;
-
-/**
- * @author clhost
- */
 public class MessageCommand implements Command {
     private MessageService messageService;
+    private Logger logger = LogManager.getLogger(MessageCommand.class);
 
     public MessageCommand(MessageService messageService) {
         this.messageService = messageService;
     }
 
     @Override
-    public void execute(ChannelSession session, Message message) {
-
-        // сначала раскидаем по сессиям
+    public void execute(ClientSession session, Message message) {
         TextMessage textMessage = (TextMessage) message;
-        List<Long> participants = session.getChatById(textMessage.getChat_id()).getParticipantIds();
-        participants.add(session.getChatById(textMessage.getChat_id()).getAdminId());
-
-        NonBlockingServer.sendMessageToOtherSessionsInRealTime(textMessage, participants);
-
-        // затем засовываем в базу
         Long msgId = messageService.addMessage(textMessage);
-        textMessage.setId(msgId);
-        System.err.println("MESSAGE [" + textMessage.getText() + "] has been added into data base. Message id [" + textMessage.getId() +
-                            "].  Chat id [" + textMessage.getChat_id() +
-                            "]. Sender id [" + textMessage.getSenderId() + "].");
+
+        if (msgId != null) {
+            textMessage.setId(msgId);
+            logger.info("Сообщение с id " + msgId + " было добавлено в базу.");
+        }
+        session.addMessage(textMessage);
     }
 }

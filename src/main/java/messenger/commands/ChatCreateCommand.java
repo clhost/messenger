@@ -1,25 +1,21 @@
 package messenger.commands;
 
 
+import messenger.net.server.ClientSession;
 import messenger.store.datasets.Chat;
 import messenger.messages.ChatCreateMessage;
 import messenger.messages.Message;
-import messenger.messages.TextMessage;
-import messenger.messages.Type;
-import messenger.net.protocol.ProtocolException;
-import messenger.net.server.ChannelSession;
 import messenger.store.MessageService;
 import messenger.store.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- * @author clhost
- */
 public class ChatCreateCommand implements Command {
     private UserService userService;
     private MessageService messageService;
+    private Logger logger = LogManager.getLogger(ChatCreateCommand.class);
 
     public ChatCreateCommand(UserService userService, MessageService messageService) {
         this.userService = userService;
@@ -27,32 +23,14 @@ public class ChatCreateCommand implements Command {
     }
 
     @Override
-    public void execute(ChannelSession session, Message message) {
+    public void execute(ClientSession session, Message message) {
         ChatCreateMessage createMessage = (ChatCreateMessage) message;
-        /* Проверка на существование пользователей : если размер списка с id из токена не равен размеру списка с id с базы данных, вернуть invalid input*/
         ArrayList<Long> input = createMessage.getParticipants();
-        ArrayList<Long> output = userService.getUsersId(input); // ТУТ
-        if (input.size() != output.size()) {
-            input.removeAll(output);
-            TextMessage textMessage = new TextMessage();
-            textMessage.setType(Type.MSG_STATUS);
-            textMessage.setText("Invalid input: Пользователи с id " + input.toString() + " не существуют.");
-            try {
-                session.send(textMessage);
-            } catch (ProtocolException | IOException e) {
-                e.printStackTrace();
-            }
+        if (input != null) {
+            Chat chat = messageService.createChat(input, createMessage.getCreator_id(), createMessage.getChatName());
+            session.addChat(chat);
         } else {
-            Chat chat = messageService.createChat(input, createMessage.getCreator_id());
-            session.addChat(chat); // добавить чат в список доступных чатов пользователя
-            TextMessage msg = new TextMessage();
-            msg.setType(Type.MSG_CHAT_DATA);
-            msg.setText(chat.getId() + ";" + chat.getAdminId() + ";" + chat.getParticipantIds().toString().replace(",", ";").replace("[", "").replace("]", "").replace(" ", ""));
-            try {
-                session.send(msg);
-            } catch (ProtocolException | IOException e) {
-                e.printStackTrace();
-            }
+            logger.warn("Не удалось создать чат с пользователями: " + createMessage.getParticipants().toString() + ".");
         }
     }
 }

@@ -1,15 +1,13 @@
 package messenger.store.datasets;
 
 
-/**
- *
- */
 public class User {
     private long id;
     private String firstName;
     private String lastName;
     private String login;
     private String password; //не щифрован
+    private String description;
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
@@ -49,5 +47,13 @@ public class User {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

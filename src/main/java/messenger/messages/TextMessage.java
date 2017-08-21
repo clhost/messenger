@@ -2,9 +2,6 @@ package messenger.messages;
 
 import java.util.Objects;
 
-/**
- * Простое текстовое сообщение
- */
 public class TextMessage extends Message {
     private String text;
     private Long chat_id;

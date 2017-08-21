@@ -1,12 +1,12 @@
 package messenger.client;
 
 
+import messenger.net.protocol.JSONProtocol;
 import messenger.store.datasets.Chat;
 import messenger.store.datasets.User;
 import messenger.messages.*;
 import messenger.net.protocol.Protocol;
 import messenger.net.protocol.ProtocolException;
-import messenger.net.protocol.StringProtocol;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -74,8 +74,13 @@ public class MessengerClient {
                     if (read > 0) {
 
                         // По сети передается поток байт, его нужно раскодировать с помощью протокола
-                        Message msg = protocol.decode(Arrays.copyOf(buf, read));
-                        onMessage(msg);
+                        //JSON json = new JSONProtocol().decode(Arrays.copyOf(buf, read));
+                        //System.out.println(json);
+                        /*Message msg = (Message) protocol.decode(Arrays.copyOf(buf, read));
+                        TextMessage textMessage = (TextMessage) msg;
+                        System.out.println(textMessage.getText());
+                        onMessage(msg);*/
+                        System.out.println(new String(Arrays.copyOf(buf, read)));
                     }
                 } catch (Exception e) {
                     System.err.println("Failed to process connection: " + e);
@@ -100,8 +105,8 @@ public class MessengerClient {
                 user.setId(message.getId());
                 user.setLogin(message.getLogin());
                 user.setPassword(message.getPassword());
-                user.setFirstName(message.getFirstname());
-                user.setLastName(message.getLastname());
+                user.setFirstName(message.getFirstName());
+                user.setLastName(message.getLastName());
                 break;
             case MSG_CHAT_DATA: //FIXME пишу тут: нет проверки на то, создан ли уже чат с данными юзерами (создать запрос и вставить ветку условия в MessageService)
                 TextMessage chatDataMessage = (TextMessage) msg;
@@ -122,7 +127,7 @@ public class MessengerClient {
                 System.out.println("List of your chats: " + msg);
                 break;
             case MSG_CHAT_HIST_RESULT:
-                System.out.println("Messages:   " + msg);
+                System.out.println("Messages: " + msg);
                 break;
             case MSG_INFO_RESULT:
                 System.out.println(msg);
@@ -160,7 +165,7 @@ public class MessengerClient {
                 printHelp();
                 break;
             case "/text":
-                if (user != null) {
+                //if (user != null) {
                     // собираем сообщение
                     StringBuilder messageTextBuilder = new StringBuilder();
                     for (int i = 2; i < tokens.length; i++) {
@@ -168,13 +173,13 @@ public class MessengerClient {
                     }
                     TextMessage sendMessage = new TextMessage();
                     sendMessage.setType(Type.MSG_TEXT);
-                    sendMessage.setSenderId(user.getId());
+                    sendMessage.setSenderId(1L);
                     sendMessage.setChat_id(Long.valueOf(tokens[1])); // FIXME id чата, куда можно отправить. Чат должен быть в списке чатов пользователя.
                     sendMessage.setText(messageTextBuilder.toString());
                     send(sendMessage);
-                } else {
+               /* } else {
                     System.out.println("Invalid input: вы не авторизованы.");
-                }
+                }*/
                 break;
             case "/info":
                 InfoMessage infoMessage = new InfoMessage();
@@ -258,8 +263,8 @@ public class MessengerClient {
     void run() throws IOException {
         MessengerClient client = new MessengerClient();
         client.setHost("127.0.0.1");
-        client.setPort(19000);
-        client.setProtocol(new StringProtocol());
+        client.setPort(8888);
+        client.setProtocol(new JSONProtocol());
 
         try {
             client.initSocket();

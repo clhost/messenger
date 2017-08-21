@@ -1,26 +1,20 @@
 package messenger.commands;
 
+import messenger.net.server.ClientSession;
 import messenger.store.datasets.Chat;
 import messenger.store.datasets.User;
 import messenger.messages.*;
-import messenger.net.protocol.ProtocolException;
-import messenger.net.server.ChannelSession;
 import messenger.store.MessageService;
 import messenger.store.UserService;
-
-import java.io.IOException;
-import java.util.HashMap;
-
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
- * @author clhost
- */
+import java.util.HashMap;
+
 public class AuthCommand implements Command {
     private UserService userService;
     private MessageService messageService;
-    Logger logger = LogManager.getLogger();
+    private Logger logger = org.apache.logging.log4j.LogManager.getLogger(AuthMessage.class);
+
 
     public AuthCommand(UserService userService, MessageService messageService) {
         this.userService = userService;
@@ -28,38 +22,23 @@ public class AuthCommand implements Command {
     }
 
     @Override
-    public void execute(ChannelSession session, Message message) {
+    public void execute(ClientSession session, Message message) {
         AuthMessage authMessage = (AuthMessage) message;
         User user = userService.getUser(authMessage.getLogin(), authMessage.getPassword());
-        TextMessage textMessage = new TextMessage();
 
+        StatusMessage status = new StatusMessage();
         if (user == null) {
-            textMessage.setText("Неверно введен логин или пароль или пользователь с такими данными не существует.");
+            status.setStatus("Неверно введен логин или пароль или пользователь с такими данными не существует.");
+            logger.warn("На сессии " + session + " были введены неверные аутентификационные данные.");
         } else {
-            session.setUser(user); // добавить пользователя в текущую сессию
-
-            HashMap<Long, Chat> users = messageService.getChatsByUserId(user.getId());
-            if (users != null) {
-                session.setChatsToCurrentUser(users); // добавить чаты пользователя (кешируются на сессии)
+            session.setUser(user);
+            HashMap<Long, Chat> chats = messageService.getChatsByUserId(user.getId());
+            if (chats != null) {
+                session.setChats(chats); // добавить чаты пользователя (кешируются на сессии)
             }
-
-            textMessage.setText("Добро пожаловать, " + user.getFirstName() + "!");
+            status.setStatus("Добро пожаловать, " + user.getFirstName() + "!");
         }
-        textMessage.setType(Type.MSG_STATUS);
-
-        try {
-            session.send(getUserData(user));
-            session.send(textMessage);
-        } catch (ProtocolException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private RegMessage getUserData(User user) throws ProtocolException, IOException { // не шифрованы
-        RegMessage message = new RegMessage(user.getLogin(), user.getPassword());
-        message.setType(Type.MSG_USER_DATA);
-        message.setFullName(user.getFirstName(), user.getLastName());
-        message.setId(user.getId());
-        return message;
+        session.send(user);
+        session.send(status);
     }
 }

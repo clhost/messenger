@@ -1,8 +1,5 @@
 package messenger.messages;
 
-/**
- * @author clhost
- */
 public class InfoMessage extends Message {
     private Long user_id;
 

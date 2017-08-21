@@ -1,8 +1,5 @@
 package messenger.messages;
 
-/**
- * @author clhost
- */
 public class AuthMessage extends Message {
     private String login;
     private String password;

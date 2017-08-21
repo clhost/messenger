@@ -1,14 +1,6 @@
 package messenger.net.protocol;
 
-import messenger.messages.Message;
-
-/**
- * @author clhost
- */
 public interface Protocol {
-
-    Message decode(byte[] bytes) throws ProtocolException;
-
-    byte[] encode(Message msg) throws ProtocolException;
-
+    Object decode(byte[] bytes) throws ProtocolException;
+    byte[] encode(Object data) throws ProtocolException;
 }

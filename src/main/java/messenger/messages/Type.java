@@ -1,8 +1,5 @@
 package messenger.messages;
 
-/**
- * Типы сообщений в системе
- */
 public enum Type {
     // Сообщения от клиента к серверу
     MSG_LOGIN, // в ответ MSG_STATUS
